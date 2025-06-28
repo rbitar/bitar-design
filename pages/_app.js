@@ -1,47 +1,10 @@
 import { useState, useEffect } from 'react';
-import { supabase, isSupabaseConfigured } from '../services/supabase';
 import Layout from '../components/Layout';
 import '../styles/globals.css';
 
 export default function App({ Component, pageProps }) {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!isSupabaseConfigured) {
-      setLoading(false);
-      return;
-    }
-
-    const loadUser = async () => {
-      try {
-        const { data, error } = await supabase.auth.getUser();
-        if (error){
-          setUser(null)
-        }
-        setUser(data.user);
-      } catch (error) {
-        console.error('Error loading user:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadUser();
-
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('Auth state changed, event:', event);
-      setUser(session?.user || null);
-    });
-
-    return () => {
-      if (authListener && authListener.subscription && authListener.subscription.unsubscribe) {
-        console.log('Unsubscribing from auth listener');
-        authListener.subscription.unsubscribe();
-      }
-    };
-  }, []);
-
+  const [loading, setLoading] = useState(false);
 
   return (
     <Layout>
